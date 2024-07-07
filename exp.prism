@@ -1,0 +1,155 @@
+mdp
+
+init
+    (((((((((((((_Reactor_state = 0 & _Reactor_used = 0) & _Reactor_Original_0_state = 1) & _Reactor_Original_1_state = 1) & _Reactor_Original_2_state = 1) & _Reactor_Spare_0_state = 0) & _Reactor_Spare_1_state = 0) & _Reactor_Spare_2_state = 0) & _Reactor_Spare_3_state = 0) & _Reactor_Spare_4_state = 0) & _Reactor_Spare_5_state = 0) & _Reactor_Spare_6_state = 0) & _Reactor_Spare_7_state = 0) & _Reactor_Spare_8_state = 0) & _Reactor_Spare_9_state = 0
+endinit
+
+formula _active = true;
+
+formula _Reactor_active = true;
+
+formula _Reactor_Original_0_active = true;
+
+formula _Reactor_Original_1_active = true;
+
+formula _Reactor_Original_2_active = true;
+
+formula _Reactor_Spare_0_active = true;
+
+formula _Reactor_Spare_1_active = true;
+
+formula _Reactor_Spare_2_active = true;
+
+formula _Reactor_Spare_3_active = true;
+
+formula _Reactor_Spare_4_active = true;
+
+formula _Reactor_Spare_5_active = true;
+
+formula _Reactor_Spare_6_active = true;
+
+formula _Reactor_Spare_7_active = true;
+
+formula _Reactor_Spare_8_active = true;
+
+formula _Reactor_Spare_9_active = true;
+
+rewards "cost"
+    _Reactor_Spare_9_active : 80 / lifespan;
+    _Reactor_Spare_8_active : 80 / lifespan;
+    _Reactor_Spare_7_active : 80 / lifespan;
+    _Reactor_Spare_6_active : 80 / lifespan;
+    _Reactor_Spare_5_active : 80 / lifespan;
+    _Reactor_Spare_4_active : 80 / lifespan;
+    _Reactor_Spare_3_active : 80 / lifespan;
+    _Reactor_Spare_2_active : 80 / lifespan;
+    _Reactor_Spare_1_active : 80 / lifespan;
+    _Reactor_Spare_0_active : 80 / lifespan;
+    [tick] _Reactor_state = 1 : hourly_cost;
+endrewards
+
+const double prob_fail = 1.0e-3;
+
+const double hourly_cost = 1000 / 24;
+
+const int max_spares = 10;
+
+const double lifespan = (40 * 365.25) * 24;
+
+module _Reactor_reactor_impl
+    _Reactor_state : [0 .. 1];
+    _Reactor_used : [0 .. max_spares];
+    
+    [] _Reactor_active & (((_Reactor_Original_0_state + _Reactor_Original_1_state) + _Reactor_Original_2_state) + (_Reactor_Spare_0_state + (_Reactor_Spare_1_state + (_Reactor_Spare_2_state + (_Reactor_Spare_3_state + (_Reactor_Spare_4_state + (_Reactor_Spare_5_state + (_Reactor_Spare_6_state + (_Reactor_Spare_7_state + (_Reactor_Spare_8_state + _Reactor_Spare_9_state))))))))) < 1.5 & _Reactor_state = 0) -> (_Reactor_state' = 1);
+endmodule
+
+module _Reactor_Original_0_ori_impl
+    _Reactor_Original_0_state : [1 .. 3];
+    
+    [tick] _Reactor_Original_0_active & _Reactor_Original_0_state = 1 -> prob_fail:(_Reactor_Original_0_state' = 2) + 1 - prob_fail:(_Reactor_Original_0_state' = 1);
+    [tick] _Reactor_Original_0_active & _Reactor_Original_0_state = 2 -> (_Reactor_Original_0_state' = 3);
+endmodule
+
+module _Reactor_Original_1_ori_impl
+    _Reactor_Original_1_state : [1 .. 3];
+    
+    [tick] _Reactor_Original_1_active & _Reactor_Original_1_state = 1 -> prob_fail:(_Reactor_Original_1_state' = 2) + 1 - prob_fail:(_Reactor_Original_1_state' = 1);
+    [tick] _Reactor_Original_1_active & _Reactor_Original_1_state = 2 -> (_Reactor_Original_1_state' = 3);
+endmodule
+
+module _Reactor_Original_2_ori_impl
+    _Reactor_Original_2_state : [1 .. 3];
+    
+    [tick] _Reactor_Original_2_active & _Reactor_Original_2_state = 1 -> prob_fail:(_Reactor_Original_2_state' = 2) + 1 - prob_fail:(_Reactor_Original_2_state' = 1);
+    [tick] _Reactor_Original_2_active & _Reactor_Original_2_state = 2 -> (_Reactor_Original_2_state' = 3);
+endmodule
+
+module _Reactor_Spare_0_spare_impl
+    _Reactor_Spare_0_state : [0 .. 3];
+    
+    [tick] _Reactor_Spare_0_active & _Reactor_Spare_0_state = 1 -> prob_fail:(_Reactor_Spare_0_state' = 2) + 1 - prob_fail:(_Reactor_Spare_0_state' = 1);
+    [tick] _Reactor_Spare_0_active & _Reactor_Spare_0_state = 2 -> (_Reactor_Spare_0_state' = 3);
+endmodule
+
+module _Reactor_Spare_1_spare_impl
+    _Reactor_Spare_1_state : [0 .. 3];
+    
+    [tick] _Reactor_Spare_1_active & _Reactor_Spare_1_state = 1 -> prob_fail:(_Reactor_Spare_1_state' = 2) + 1 - prob_fail:(_Reactor_Spare_1_state' = 1);
+    [tick] _Reactor_Spare_1_active & _Reactor_Spare_1_state = 2 -> (_Reactor_Spare_1_state' = 3);
+endmodule
+
+module _Reactor_Spare_2_spare_impl
+    _Reactor_Spare_2_state : [0 .. 3];
+    
+    [tick] _Reactor_Spare_2_active & _Reactor_Spare_2_state = 1 -> prob_fail:(_Reactor_Spare_2_state' = 2) + 1 - prob_fail:(_Reactor_Spare_2_state' = 1);
+    [tick] _Reactor_Spare_2_active & _Reactor_Spare_2_state = 2 -> (_Reactor_Spare_2_state' = 3);
+endmodule
+
+module _Reactor_Spare_3_spare_impl
+    _Reactor_Spare_3_state : [0 .. 3];
+    
+    [tick] _Reactor_Spare_3_active & _Reactor_Spare_3_state = 1 -> prob_fail:(_Reactor_Spare_3_state' = 2) + 1 - prob_fail:(_Reactor_Spare_3_state' = 1);
+    [tick] _Reactor_Spare_3_active & _Reactor_Spare_3_state = 2 -> (_Reactor_Spare_3_state' = 3);
+endmodule
+
+module _Reactor_Spare_4_spare_impl
+    _Reactor_Spare_4_state : [0 .. 3];
+    
+    [tick] _Reactor_Spare_4_active & _Reactor_Spare_4_state = 1 -> prob_fail:(_Reactor_Spare_4_state' = 2) + 1 - prob_fail:(_Reactor_Spare_4_state' = 1);
+    [tick] _Reactor_Spare_4_active & _Reactor_Spare_4_state = 2 -> (_Reactor_Spare_4_state' = 3);
+endmodule
+
+module _Reactor_Spare_5_spare_impl
+    _Reactor_Spare_5_state : [0 .. 3];
+    
+    [tick] _Reactor_Spare_5_active & _Reactor_Spare_5_state = 1 -> prob_fail:(_Reactor_Spare_5_state' = 2) + 1 - prob_fail:(_Reactor_Spare_5_state' = 1);
+    [tick] _Reactor_Spare_5_active & _Reactor_Spare_5_state = 2 -> (_Reactor_Spare_5_state' = 3);
+endmodule
+
+module _Reactor_Spare_6_spare_impl
+    _Reactor_Spare_6_state : [0 .. 3];
+    
+    [tick] _Reactor_Spare_6_active & _Reactor_Spare_6_state = 1 -> prob_fail:(_Reactor_Spare_6_state' = 2) + 1 - prob_fail:(_Reactor_Spare_6_state' = 1);
+    [tick] _Reactor_Spare_6_active & _Reactor_Spare_6_state = 2 -> (_Reactor_Spare_6_state' = 3);
+endmodule
+
+module _Reactor_Spare_7_spare_impl
+    _Reactor_Spare_7_state : [0 .. 3];
+    
+    [tick] _Reactor_Spare_7_active & _Reactor_Spare_7_state = 1 -> prob_fail:(_Reactor_Spare_7_state' = 2) + 1 - prob_fail:(_Reactor_Spare_7_state' = 1);
+    [tick] _Reactor_Spare_7_active & _Reactor_Spare_7_state = 2 -> (_Reactor_Spare_7_state' = 3);
+endmodule
+
+module _Reactor_Spare_8_spare_impl
+    _Reactor_Spare_8_state : [0 .. 3];
+    
+    [tick] _Reactor_Spare_8_active & _Reactor_Spare_8_state = 1 -> prob_fail:(_Reactor_Spare_8_state' = 2) + 1 - prob_fail:(_Reactor_Spare_8_state' = 1);
+    [tick] _Reactor_Spare_8_active & _Reactor_Spare_8_state = 2 -> (_Reactor_Spare_8_state' = 3);
+endmodule
+
+module _Reactor_Spare_9_spare_impl
+    _Reactor_Spare_9_state : [0 .. 3];
+    
+    [tick] _Reactor_Spare_9_active & _Reactor_Spare_9_state = 1 -> prob_fail:(_Reactor_Spare_9_state' = 2) + 1 - prob_fail:(_Reactor_Spare_9_state' = 1);
+    [tick] _Reactor_Spare_9_active & _Reactor_Spare_9_state = 2 -> (_Reactor_Spare_9_state' = 3);
+endmodule

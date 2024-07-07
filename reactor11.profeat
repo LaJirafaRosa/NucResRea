@@ -1,0 +1,47 @@
+ctmc
+
+const double pf_ion = 2.4e-5;//1e-6; //fail propability ionization chamber
+const double pr_ion = 0.072;//3e-3; //replacement rate ionization chamber
+const double hourly_cost = 1000;
+const int max_spares_ion = 10;
+const int k = 2; // minimum of two working parts
+
+
+root feature
+	all of Reactor;
+endfeature
+
+
+feature Reactor
+	all of Ion;
+	rewards "cost"
+		Ion.i_parts < k : hourly_cost;
+	endrewards
+endfeature
+
+feature Ion
+	modules ion_impl;
+
+	rewards "cost"
+		cost : (80 * s_parts); 
+	endrewards
+endfeature
+
+module ion_impl
+	replace : [0 .. 3] init 0;
+	s_parts : [0 .. max_spares_ion]; //spare parts
+	cost : bool init true; //add costs for spare parts once
+	i_parts : [0 .. 3] init 3;// implemented parts (warehouse parts cannot fail)
+	in_repair: bool init false;
+
+	[cost] cost -> 1: (cost' = false);
+	[step] i_parts > 0 & replace < 3 -> i_parts*pf_ion : (i_parts' = i_parts - 1) & (replace' = replace + 1) + (1 - i_parts*pf_ion) : (replace' = replace);
+	[step] !in_repair & replace > 0 -> 1 : (in_repair' = true); 
+	[step] in_repair & replace > 0 & s_parts > 0 & i_parts < 3 -> pr_ion : (i_parts' = i_parts + 1) & (s_parts' = s_parts - 1) & (replace' = replace - 1) & (in_repair' = false) + (1 - pr_ion) : (replace' = replace);
+endmodule
+
+
+
+
+
+	

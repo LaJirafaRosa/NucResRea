@@ -1,0 +1,52 @@
+ctmc
+
+init
+    _Reactor_Ion_cost = true & _Reactor_Ion_i_parts = 3 & _Reactor_Ion_in_repair = false & _Reactor_Ion_replace = 0 & _cum_rew = 0 & _Reactor_Ion_s_parts = max_spares_ion
+endinit
+
+formula _active = true;
+
+formula _Reactor_active = true;
+
+formula _Reactor_Ion_active = true;
+
+formula _Reactor_RPS_active = true;
+
+rewards "cost"
+    _Reactor_Ion_cost : 80 * _Reactor_Ion_s_parts;
+    [hourly] _Reactor_Ion_i_parts < k : hourly_cost; //either part has less than 2 active parts the reactor is non-operable
+endrewards
+
+const double pf_ion = 2.4e-5; //fail probability Ionization chamber
+
+const double pr_ion = 7.2e-2; //replacement rate Ionization chamber
+
+const double pf_rps = 2.4e-3; ////fail probability RPS
+
+const double pr_rps = 0.24; //replacement rate RPS
+
+const double hourly_cost = 1000;//old variable, it's actually per day now
+
+const int max_spares_ion;
+
+const int k = 2;
+
+module _Reactor_Ion_ion_impl
+    _Reactor_Ion_replace : [0 .. 3]; //amount of parts which need to be replaced
+    _Reactor_Ion_s_parts : [0 .. max_spares_ion]; //amount of spares left
+    _Reactor_Ion_cost : bool; //necessary for cost once
+    _Reactor_Ion_i_parts : [0 .. 3]; //currently implemented parts
+    _Reactor_Ion_in_repair : bool; //if there is a part of rps in repair
+    _cum_rew : [0 .. 31];
+    
+    [cost] _Reactor_Ion_active & _Reactor_Ion_cost -> 1:(_Reactor_Ion_cost' = false); //make sure cost is counted once
+//fail check, parts fail with probability pf_ion, if that happens there is one less implemented part and one more part to be replaced
+    [step] _Reactor_Ion_active & (_Reactor_Ion_i_parts > 0 & _Reactor_Ion_replace < 3) -> (_Reactor_Ion_i_parts * pf_ion):(_Reactor_Ion_i_parts' = _Reactor_Ion_i_parts - 1) & (_Reactor_Ion_replace' = _Reactor_Ion_replace + 1) + (1 - _Reactor_Ion_i_parts * pf_ion):(_Reactor_Ion_replace' = _Reactor_Ion_replace);
+//check if part can be repaired (aka if no other part is being repaired) if yes, the part is now being repaired
+    [step] _Reactor_Ion_active & !_Reactor_Ion_in_repair & _Reactor_Ion_replace > 0 -> 1:(_Reactor_Ion_in_repair' = true);
+//If the part is in repair, it has a certain "chance" of being repaired (pr_ion), if that happens, there is one extra implemented part, and one less spare part and one less part to be repaired
+    [step] _Reactor_Ion_active & (((_Reactor_Ion_in_repair & _Reactor_Ion_replace > 0) & _Reactor_Ion_s_parts > 0) & _Reactor_Ion_i_parts < 3) -> (pr_ion) :(_Reactor_Ion_i_parts' = _Reactor_Ion_i_parts + 1) & (_Reactor_Ion_s_parts' = _Reactor_Ion_s_parts - 1) & (_Reactor_Ion_replace' = _Reactor_Ion_replace - 1) & (_Reactor_Ion_in_repair' = false) + (1 - pr_ion):(_Reactor_Ion_replace' = _Reactor_Ion_replace);
+    [hourly] _Reactor_Ion_i_parts < k & _cum_rew < 31 -> 1: (_cum_rew' = _cum_rew + 1);
+endmodule
+
+label "down_exceeds_30" = _cum_rew > 30;

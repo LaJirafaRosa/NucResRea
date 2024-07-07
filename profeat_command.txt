@@ -1,0 +1,14 @@
+cd C:\sr\profeat-0.118.0.0.tar\profeat-0.118.0.0\profeat
+profeat reactor.profeat reactor.fprops --prism-path C:\prism\bin\prism.bat --prism-args "-s"
+
+profeat reactor2.profeat reactor.fprops --prism-path C:\prism\bin\prism.bat --prism-args "-s"
+
+profeat reactor3.profeat reactor.fprops --prism-path C:\prism\bin\prism.bat --prism-args "-s"
+
+profeat reactor2.profeat reactor.fprops --export-results downtime2.csv --import-results downtime2.log
+
+profeat reactor21.profeat reactor.fprops --prism-path C:\prism\bin\prism.bat --prism-args "-s"
+
+profeat reactor11.profeat reactor.fprops --prism-path C:\prism\bin\prism.bat --prism-args "-s"
+
+profeat reactor31.profeat reactor.fprops --prism-path C:\prism\bin\prism.bat --prism-args "-s"
